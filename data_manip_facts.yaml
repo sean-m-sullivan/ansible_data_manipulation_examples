@@ -1,0 +1,34 @@
+---
+- name: Playbook to mainpulate data
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - workflows.yml
+
+  tasks:
+
+    - name: Setting workflows
+      ansible.builtin.set_fact:
+        workflows: "{{ workflow_job_templates | map(attribute='name') }}"
+        #inventory_sources: "{{ workflow_job_templates | map(attribute='name') }}"
+        #approval_nodes: "{{ workflow_job_templates | map(attribute='name') }}"
+
+    - name: Setting facts
+      ansible.builtin.set_fact:
+        workflow_nodes: "{{ workflow_nodes | default([]) + [ workflow_item.related.workflow_nodes] }}"
+      loop: "{{ workflow_job_templates }}"
+      loop_control:
+        loop_var: workflow_item
+
+    - name: Setting facts
+      ansible.builtin.set_fact:
+        data_loop:
+          inventory_sources: "{{ inventory_source | default([]) + [ workflow_node ] }}"
+      loop: "{{ workflow_nodes }}"
+      loop_control:
+        loop_var: workflow_node
+
+    - name: Show output
+      ansible.builtin.debug:
+        var: workflow_nodes
+...

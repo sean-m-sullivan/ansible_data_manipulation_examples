@@ -1,0 +1,16 @@
+---
+- name: Playbook to mainpulate data
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - workflows.yml
+
+  tasks:
+    - name: Transform Data
+      ansible.builtin.set_fact:
+        data_out: "{{ workflow_job_templates | example_filter }}"
+    
+    - name: Show output
+      ansible.builtin.debug:
+        var: data_out
+...
